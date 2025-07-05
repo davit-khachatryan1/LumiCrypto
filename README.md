@@ -1,271 +1,120 @@
-# 🌟 LumiCrypto - AI-Powered Crypto Insights
+# LumiCrypto 🚀
 
-A modern, full-featured cryptocurrency analysis platform powered by artificial intelligence. Built with Next.js, TypeScript, and cutting-edge technologies.
+**AI-Powered Cryptocurrency Analysis Platform**
 
-## ✨ Features
+LumiCrypto is your intelligent companion for navigating the cryptocurrency market. Get instant AI-powered insights, risk assessments, and portfolio analysis to make informed investment decisions.
 
-### 🏠 Landing Page
-- **Stunning Hero Section** with animated gradients and floating elements
-- **Trending Tokens Carousel** with real-time data from CoinGecko
-- **Feature Highlights** with smooth animations
-- **Responsive Design** that works on all devices
+## 🌟 What is LumiCrypto?
 
-### 🔍 Explore & Search
-- **Advanced Token Search** with real-time suggestions
-- **Smart Filtering** by category, chain, and market metrics
-- **Grid/List View Toggle** for optimal viewing
-- **Infinite Scroll** with smooth loading animations
-- **Market Statistics** dashboard
+LumiCrypto combines artificial intelligence with real-time market data to provide comprehensive cryptocurrency analysis. Whether you're a beginner or experienced trader, our platform helps you understand market trends, assess risks, and optimize your portfolio.
 
-### 📊 Token Analysis
-- **Detailed Token Information** with comprehensive market data
-- **Interactive Price Charts** using Recharts
-- **AI-Powered Risk Analysis** with confidence scoring
-- **Community Sentiment Analysis**
-- **Strength & Risk Factor Identification**
-- **Social Links & Project Information**
+## 📱 Platform Features
 
-### 👛 Wallet Integration
-- **Connect Multiple Wallets** (MetaMask, WalletConnect, etc.)
-- **Portfolio Overview** with real-time valuations
-- **Asset Distribution Charts** with beautiful visualizations
-- **AI Portfolio Analysis** with risk assessment
-- **Performance Tracking** and insights
+### 🏠 **Home Page**
+Your starting point featuring:
+- Overview of platform capabilities
+- Trending cryptocurrencies carousel
+- Quick access to main features
+- Market highlights and insights
 
-### 📈 Dashboard
-- **Personalized Overview** with portfolio performance
-- **AI-Generated Insights** and market alerts
-- **Top Gainers/Losers** tracking
-- **Market Overview** with key statistics
-- **Quick Actions** for common tasks
+### 🔍 **Explore Page**
+Discover and analyze cryptocurrencies:
+- Browse thousands of tokens and coins
+- Search by name, symbol, or keyword
+- Filter by market cap, category, and chains
+- Sort by various metrics (price, volume, change)
+- Switch between grid and list views
+- Pagination for easy navigation
 
-### ⚙️ Settings
-- **Theme Toggle** (Light/Dark mode)
-- **Profile Management** with user preferences
-- **Wallet Management** and connection status
-- **Data Export/Import** functionality
-- **Privacy Controls** and security settings
+### 💰 **Token Details Pages**
+Deep dive into any cryptocurrency:
+- Comprehensive token information
+- Real-time price charts and market data
+- AI-powered risk analysis and scoring
+- Detailed statistics (market cap, volume, supply)
+- Price history and performance metrics
+- AI recommendations and insights
 
-## 🛠️ Technology Stack
+### 👛 **Wallet Analysis**
+Connect your wallet for personalized insights:
+- Portfolio overview and total value
+- Asset distribution charts
+- AI-powered portfolio analysis
+- Risk assessment for your holdings
+- Diversification recommendations
+- Performance tracking
 
-### Frontend
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-- **Framer Motion** - Smooth animations and transitions
-- **Recharts** - Beautiful data visualizations
-- **Lucide React** - Modern icon library
+### 📊 **Dashboard**
+Your personalized crypto command center:
+- Portfolio performance overview
+- Market statistics and trends
+- AI-generated insights for your holdings
+- Recent activity tracking
+- Quick access to analysis tools
 
-### State Management & Data
-- **Zustand** - Lightweight state management
-- **React Query** - Server state management
-- **Axios** - HTTP client for API requests
+### ⚙️ **Settings**
+Customize your experience:
+- Theme preferences (light/dark mode)
+- Wallet connection management
+- Notification preferences
+- Data export and privacy controls
+- Account preferences
 
-### Web3 Integration
-- **Wagmi** - React hooks for Ethereum
-- **Viem** - TypeScript interface for Ethereum
-- **RainbowKit** - Wallet connection UI
+## 🔗 **Additional Pages**
 
-### APIs & Data Sources
-- **CoinGecko API** - Cryptocurrency market data
-- **DeFiLlama API** - DeFi protocol information
-- **Mock AI Analysis** - Simulated AI insights (ready for real AI integration)
+### 📋 **Information Pages**
+- **About**: Learn about our mission and team
+- **Pricing**: Explore our service plans and features
+- **API Documentation**: For developers and integrations
+- **Help Center**: FAQs and user guides
 
-## 🚀 Getting Started
+### 🏢 **Company Pages**
+- **Blog**: Latest crypto insights and market analysis
+- **Careers**: Join our growing team
+- **Contact**: Get in touch with our support team
+- **Community**: Connect with other users
 
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn package manager
+### 📈 **Platform Pages**
+- **Status**: Real-time system status and uptime
+- **Updates**: Latest platform improvements and features
 
-### Installation
+### ⚖️ **Legal Pages**
+- **Privacy Policy**: How we protect your data
+- **Terms of Service**: Platform usage terms
+- **Cookie Policy**: Information about cookies
+- **Disclaimer**: Important risk and investment disclaimers
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/lumicrypto.git
-   cd lumicrypto
-   ```
+## 🎯 **Who is LumiCrypto For?
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+**New Investors**: Get AI-powered guidance to understand crypto markets safely
 
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Add your API keys:
-   ```env
-   NEXT_PUBLIC_COINGECKO_API_KEY=your_coingecko_api_key
-   NEXT_PUBLIC_AI_API_URL=your_ai_api_endpoint
-   ```
+**Active Traders**: Access real-time analysis and risk assessments for better decisions
 
-4. **Run the development server**
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
+**Portfolio Managers**: Track and optimize crypto portfolios with intelligent insights
 
-5. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+**Researchers**: Dive deep into token fundamentals and market analytics
 
-## 📱 Screenshots
+## 🔑 **Key Benefits**
 
-### Landing Page
-![Landing Page](screenshots/landing.png)
-*Beautiful hero section with trending tokens carousel*
+- **Instant Analysis**: Get comprehensive token insights in seconds
+- **Risk Assessment**: AI-powered risk scoring for informed decisions
+- **Portfolio Insights**: Analyze your holdings for optimal diversification
+- **Real-time Data**: Always up-to-date market information
+- **User-friendly**: Clean, intuitive interface for all experience levels
+- **Comprehensive**: From basic info to advanced analytics
 
-### Token Analysis
-![Token Analysis](screenshots/token-analysis.png)
-*Comprehensive AI-powered token analysis*
+## 🚀 **Getting Started**
 
-### Portfolio Dashboard
-![Portfolio](screenshots/portfolio.png)
-*Wallet integration with portfolio analytics*
+1. **Visit** the platform and explore trending tokens
+2. **Search** for specific cryptocurrencies you're interested in
+3. **Connect** your wallet for personalized portfolio analysis
+4. **Analyze** tokens with AI-powered insights
+5. **Make** informed decisions based on comprehensive data
 
-## 🎨 Design System
+## 🌐 **Access LumiCrypto**
 
-### Color Palette
-- **Primary**: Purple (#7c3aed) - Main brand color
-- **Secondary**: Pink (#ec4899) - Accent color
-- **Success**: Green (#10b981) - Positive indicators
-- **Warning**: Yellow (#f59e0b) - Caution states
-- **Error**: Red (#ef4444) - Negative indicators
-
-### Typography
-- **Font**: Inter - Clean, modern typeface
-- **Headings**: Bold weights with gradient effects
-- **Body**: Regular weight for readability
-
-### Animations
-- **Page Transitions**: Smooth fade and slide effects
-- **Hover States**: Scale and glow effects
-- **Loading States**: Skeleton loaders and shimmer effects
-- **Stagger Animations**: Sequential element appearances
-
-## 🔧 Configuration
-
-### Tailwind Configuration
-The project uses a custom Tailwind configuration with:
-- **Custom Colors** - Brand-specific color palette
-- **Extended Animations** - Custom keyframes and transitions
-- **Glass Morphism** - Modern glassmorphic design patterns
-- **Responsive Breakpoints** - Mobile-first design approach
-
-### API Integration
-- **Rate Limiting** - Intelligent request throttling
-- **Error Handling** - Graceful fallbacks and user feedback
-- **Caching** - Optimized data fetching with React Query
-- **Mock Data** - Development-friendly fallbacks
-
-## 🤖 AI Integration
-
-The platform is designed to integrate with various AI services:
-
-### Current Implementation
-- **Mock AI Analysis** - Simulated responses for development
-- **Risk Scoring** - Algorithm-based risk assessment
-- **Sentiment Analysis** - Community sentiment evaluation
-
-### Ready for Integration
-- **OpenAI GPT** - Natural language analysis
-- **Custom ML Models** - Specialized crypto analysis
-- **Real-time Processing** - Live market analysis
-- **Confidence Scoring** - AI prediction confidence
-
-## 🔒 Security & Privacy
-
-### Data Protection
-- **Client-side State** - No sensitive data stored on servers
-- **Wallet Security** - Read-only access to wallet data
-- **API Key Protection** - Environment variable management
-- **Privacy Controls** - User-controlled data sharing
-
-### Best Practices
-- **Type Safety** - TypeScript for runtime error prevention
-- **Input Validation** - Sanitized user inputs
-- **Error Boundaries** - Graceful error handling
-- **Rate Limiting** - API abuse prevention
-
-## 📊 Performance
-
-### Optimization Features
-- **Image Optimization** - Next.js automatic image optimization
-- **Code Splitting** - Automatic route-based splitting
-- **Lazy Loading** - On-demand component loading
-- **Caching** - Intelligent data and asset caching
-
-### Metrics
-- **Lighthouse Score**: 95+ (Performance, Accessibility, SEO)
-- **Core Web Vitals**: Excellent ratings
-- **Bundle Size**: Optimized for fast loading
-
-## 🌐 Deployment
-
-### Vercel (Recommended)
-```bash
-npm install -g vercel
-vercel --prod
-```
-
-### Docker
-```bash
-docker build -t lumicrypto .
-docker run -p 3000:3000 lumicrypto
-```
-
-### Environment Variables
-```env
-NEXT_PUBLIC_COINGECKO_API_KEY=your_api_key
-NEXT_PUBLIC_AI_API_URL=your_ai_endpoint
-NEXT_PUBLIC_WALLET_CONNECT_ID=your_wallet_connect_id
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### Development Process
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Code Standards
-- **TypeScript** - All code must be type-safe
-- **ESLint** - Follow the configured linting rules
-- **Prettier** - Code formatting consistency
-- **Component Tests** - Write tests for new components
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **CoinGecko** - Cryptocurrency market data
-- **DeFiLlama** - DeFi protocol information  
-- **Framer Motion** - Beautiful animations
-- **Tailwind CSS** - Styling framework
-- **Lucide** - Icon library
-- **Next.js Team** - Amazing React framework
-
-## 📞 Support
-
-- **Documentation**: [docs.lumicrypto.com](https://docs.lumicrypto.com)
-- **Discord**: [Join our community](https://discord.gg/lumicrypto)
-- **Twitter**: [@lumicrypto](https://twitter.com/lumicrypto)
-- **Email**: hello@lumicrypto.com
+Visit our platform to start your intelligent crypto journey today!
 
 ---
 
-<div align="center">
-  <strong>Built with ❤️ for the crypto community</strong>
-  <br>
-  <sub>Made by developers, for developers</sub>
-</div> 
+*LumiCrypto - Making cryptocurrency analysis accessible, intelligent, and actionable for everyone.* 
