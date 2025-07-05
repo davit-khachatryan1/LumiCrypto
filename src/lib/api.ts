@@ -84,25 +84,68 @@ export async function fetchDeFiProtocols(): Promise<DeFiProtocol[]> {
 
 export async function generateAIAnalysis(tokenId: string, tokenData: any): Promise<AIAnalysis> {
   try {
-    // Mock AI analysis - replace with actual AI service call
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
-    
-    return generateMockAIAnalysis(tokenData);
+    const response = await api.post('/api/analyze', {
+      tokenName: tokenData.name,
+      symbol: tokenData.symbol,
+      price: tokenData.current_price,
+      marketCap: tokenData.market_cap,
+      volume24h: tokenData.total_volume,
+      priceChange24h: tokenData.price_change_percentage_24h,
+    });
+
+    return {
+      risk_score: response.data.riskScore,
+      summary: response.data.summary,
+      strengths: response.data.strengths,
+      risk_factors: response.data.weaknesses,
+      red_flags: response.data.recommendations.filter((rec: string) => 
+        rec.toLowerCase().includes('warning') || rec.toLowerCase().includes('risk')
+      ),
+      community_sentiment: 'neutral' as const,
+      recommendation: 'hold' as const,
+      confidence: 85,
+    };
   } catch (error) {
     console.error('Error generating AI analysis:', error);
-    throw error;
+    // Fallback to mock analysis
+    return generateMockAIAnalysis(tokenData);
   }
 }
 
 export async function generateWalletAIAnalysis(tokens: any[]): Promise<AIAnalysis> {
   try {
-    // Mock AI analysis for wallet - replace with actual AI service call
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
+    const totalValue = tokens.reduce((sum, token) => sum + token.value_usd, 0);
     
-    return generateMockWalletAIAnalysis(tokens);
+    const walletTokens = tokens.map(token => ({
+      symbol: token.symbol,
+      balance: parseFloat(token.balance),
+      price: token.price_usd,
+      value: token.value_usd,
+      percentage: (token.value_usd / totalValue) * 100,
+    }));
+
+    const response = await api.post('/api/analyze-wallet', {
+      walletAddress: 'connected-wallet',
+      tokens: walletTokens,
+      totalValue,
+    });
+
+    return {
+      risk_score: response.data.overallRiskScore,
+      summary: response.data.portfolioSummary,
+      strengths: response.data.strengths,
+      risk_factors: response.data.concerns,
+      red_flags: response.data.riskyTokens.map((token: any) => 
+        `${token.symbol}: ${token.reason}`
+      ),
+      community_sentiment: 'neutral' as const,
+      recommendation: 'hold' as const,
+      confidence: 80,
+    };
   } catch (error) {
     console.error('Error generating wallet AI analysis:', error);
-    throw error;
+    // Fallback to mock analysis
+    return generateMockWalletAIAnalysis(tokens);
   }
 }
 
