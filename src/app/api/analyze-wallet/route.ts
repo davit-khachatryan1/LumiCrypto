@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAIClient() {
+  if (!process.env.OPENAI_API_KEY) {
+    return null;
+  }
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 interface WalletToken {
   symbol: string;
@@ -133,6 +138,11 @@ async function analyzeWalletWithAI(walletData: any): Promise<WalletAnalysisRespo
   `;
 
   try {
+    const openai = getOpenAIClient();
+    if (!openai) {
+      throw new Error('OpenAI client not available');
+    }
+    
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [

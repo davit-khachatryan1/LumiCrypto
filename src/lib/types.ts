@@ -348,4 +348,40 @@ export interface SLASettings {
   resolutionTime: number; // in hours
   availabilityTarget: number; // percentage
   monitoring: boolean;
+}
+
+export interface BillingPlan {
+  id: string;
+  name: string;
+  price: number;
+  interval: 'monthly' | 'yearly';
+  features: string[];
+  limits: {
+    tokensPerMonth: number;
+    alertsLimit: number;
+    teamsLimit: number;
+    apiCallsLimit: number;
+  };
+}
+
+export interface UserSubscription {
+  planId: string;
+  status: 'active' | 'cancelled' | 'expired';
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+  cancelAtPeriodEnd: boolean;
+}
+
+export interface FeatureAccess {
+  canUseFeature: boolean;
+  reason?: string;
+  upgradeRequired?: boolean;
+  planRequired?: string;
+}
+
+export interface UsageLimits {
+  tokensAnalyzed: number;
+  alertsCreated: number;
+  teamsCreated: number;
+  apiCallsMade: number;
 } 

@@ -20,15 +20,19 @@ import {
   Mail,
   MessageSquare,
   Smartphone,
-  Globe
+  Globe,
+  Lock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useBillingStore } from '@/lib/store';
+import { UpgradePrompt, LimitReachedPrompt } from '@/components/UpgradePrompt';
 
 export default function AlertsPage() {
   const { address } = useAccount();
   const [alerts, setAlerts] = useState<CustomAlert[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { currentPlan, canCreateAlert, getRemainingLimits, updateUsage } = useBillingStore();
 
   useEffect(() => {
     if (address) {
@@ -150,11 +154,44 @@ export default function AlertsPage() {
                 Stay informed with personalized price and portfolio alerts
               </p>
             </div>
-            <Button onClick={() => setShowCreateModal(true)}>
+            <Button 
+              onClick={() => setShowCreateModal(true)}
+              disabled={!canCreateAlert()}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Create Alert
             </Button>
           </div>
+        </motion.div>
+
+        {/* Plan Limits */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <Card className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium">Current Plan:</span>
+                  <span className="text-sm font-bold text-primary">{currentPlan.name}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-muted-foreground">Alerts:</span>
+                  <span className="text-sm font-medium">
+                    {alerts.length}{currentPlan.limits.alertsLimit === -1 ? ' (Unlimited)' : `/${currentPlan.limits.alertsLimit}`}
+                  </span>
+                </div>
+              </div>
+              {!canCreateAlert() && (
+                <div className="flex items-center space-x-2 text-orange-500">
+                  <Lock className="w-4 h-4" />
+                  <span className="text-sm">Limit Reached</span>
+                </div>
+              )}
+            </div>
+          </Card>
         </motion.div>
 
         {/* Stats */}
@@ -259,10 +296,10 @@ export default function AlertsPage() {
                     return (
                       <div
                         key={alert.id}
-                        className={`p-4 border rounded-lg ${
+                        className={`p-4 border rounded-lg shadow-sm hover:shadow-md transition-all duration-200 ${
                           alert.isActive 
-                            ? 'bg-green-50 border-green-200' 
-                            : 'bg-gray-50 border-gray-200'
+                            ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800 shadow-green-100 dark:shadow-green-950/40' 
+                            : 'bg-muted border-border hover:bg-muted/80'
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -336,6 +373,22 @@ export default function AlertsPage() {
           </Card>
         </motion.div>
 
+        {/* Upgrade Prompt */}
+        {!canCreateAlert() && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8"
+          >
+            <LimitReachedPrompt
+              limitType="alerts"
+              current={alerts.length}
+              limit={currentPlan.limits.alertsLimit}
+              requiredPlan="pro"
+            />
+          </motion.div>
+        )}
+
         {/* Create Alert Modal */}
         {showCreateModal && (
           <CreateAlertModal
@@ -344,6 +397,8 @@ export default function AlertsPage() {
             onAlertCreated={(newAlert) => {
               setAlerts([...alerts, newAlert]);
               setShowCreateModal(false);
+              // Update usage count
+              updateUsage({ alertsCreated: alerts.length + 1 });
             }}
             userId={address}
           />
@@ -428,7 +483,7 @@ function CreateAlertModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+        className="bg-card text-card-foreground rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
       >
         <h2 className="text-2xl font-bold mb-4">Create New Alert</h2>
         

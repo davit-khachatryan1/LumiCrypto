@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+
 import { cn } from '@/lib/utils';
 import { forwardRef } from 'react';
 
@@ -12,11 +12,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const buttonVariants = {
-  primary: 'bg-primary hover:bg-primary/90 text-primary-foreground',
-  secondary: 'bg-secondary hover:bg-secondary/80 text-secondary-foreground',
-  outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-  ghost: 'hover:bg-accent hover:text-accent-foreground',
-  destructive: 'bg-destructive hover:bg-destructive/90 text-destructive-foreground',
+  primary: 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg dark:shadow-lg dark:hover:shadow-xl',
+  secondary: 'bg-secondary hover:bg-secondary/80 text-secondary-foreground shadow-sm hover:shadow-md dark:shadow-md dark:hover:shadow-lg',
+  outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm hover:shadow-md dark:shadow-inner dark:hover:shadow-lg',
+  ghost: 'hover:bg-accent hover:text-accent-foreground hover:shadow-sm dark:hover:shadow-md',
+  destructive: 'bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-md hover:shadow-lg dark:shadow-lg dark:hover:shadow-xl',
 };
 
 const buttonSizes = {
@@ -28,28 +28,22 @@ const buttonSizes = {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', loading, disabled, children, ...props }, ref) => {
     return (
-      <motion.button
+      <button
         ref={ref}
         className={cn(
-          'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+          'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none hover:scale-[1.02] active:scale-[0.98]',
           buttonVariants[variant],
           buttonSizes[size],
           className
         )}
         disabled={disabled || loading}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
         {...props}
       >
         {loading && (
-          <motion.div
-            className="w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          />
+          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2 animate-spin" />
         )}
         {children}
-      </motion.button>
+      </button>
     );
   }
 );

@@ -24,9 +24,13 @@ import {
   UserPlus,
   Activity,
   Target,
-  Zap
+  Zap,
+  Lock,
+  Clock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useBillingStore } from '@/lib/store';
+import { UpgradePrompt, LimitReachedPrompt, FeatureGate } from '@/components/UpgradePrompt';
 
 export default function TeamsPage() {
   const { address } = useAccount();
@@ -35,6 +39,7 @@ export default function TeamsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
+  const { currentPlan, canCreateTeam, checkFeatureAccess, updateUsage } = useBillingStore();
 
   useEffect(() => {
     if (address) {
@@ -68,11 +73,11 @@ export default function TeamsPage() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'owner': return 'text-purple-600 bg-purple-50';
-      case 'admin': return 'text-blue-600 bg-blue-50';
-      case 'member': return 'text-green-600 bg-green-50';
-      case 'viewer': return 'text-gray-600 bg-gray-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'owner': return 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/20';
+      case 'admin': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20';
+      case 'member': return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20';
+      case 'viewer': return 'text-muted-foreground bg-muted';
+      default: return 'text-muted-foreground bg-muted';
     }
   };
 
@@ -114,11 +119,46 @@ export default function TeamsPage() {
                 Create teams, invite members, and manage enterprise features
               </p>
             </div>
-            <Button onClick={() => setShowCreateModal(true)}>
+            <Button 
+              onClick={() => setShowCreateModal(true)}
+              disabled={!canCreateTeam()}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Create Team
             </Button>
           </div>
+        </motion.div>
+
+        {/* Plan Limits */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <Card className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium">Current Plan:</span>
+                  <span className="text-sm font-bold text-primary">{currentPlan.name}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-muted-foreground">Teams:</span>
+                  <span className="text-sm font-medium">
+                    {teams.length}{currentPlan.limits.teamsLimit === -1 ? ' (Unlimited)' : `/${currentPlan.limits.teamsLimit}`}
+                  </span>
+                </div>
+              </div>
+              {!canCreateTeam() && (
+                <div className="flex items-center space-x-2 text-orange-500">
+                  <Lock className="w-4 h-4" />
+                  <span className="text-sm">
+                    {currentPlan.limits.teamsLimit === 0 ? 'Teams Not Available' : 'Limit Reached'}
+                  </span>
+                </div>
+              )}
+            </div>
+          </Card>
         </motion.div>
 
         {/* Teams List */}
@@ -154,7 +194,7 @@ export default function TeamsPage() {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card 
-                  className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
+                  className="p-6 cursor-pointer shadow-md hover:shadow-lg dark:shadow-xl dark:hover:shadow-2xl transition-all duration-200"
                   onClick={() => setSelectedTeam(team)}
                 >
                   <div className="flex items-center justify-between mb-4">
@@ -211,6 +251,31 @@ export default function TeamsPage() {
           )}
         </div>
 
+        {/* Upgrade Prompt */}
+        {!canCreateTeam() && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8"
+          >
+            {currentPlan.limits.teamsLimit === 0 ? (
+              <UpgradePrompt
+                feature="multi-team-access"
+                title="Teams Not Available"
+                description="Team management is available for Pro and Enterprise plans. Upgrade to create and manage teams."
+                requiredPlan="pro"
+              />
+            ) : (
+              <LimitReachedPrompt
+                limitType="teams"
+                current={teams.length}
+                limit={currentPlan.limits.teamsLimit}
+                requiredPlan="enterprise"
+              />
+            )}
+          </motion.div>
+        )}
+
         {/* Create Team Modal */}
         {showCreateModal && (
           <CreateTeamModal
@@ -219,6 +284,8 @@ export default function TeamsPage() {
             onTeamCreated={(newTeam) => {
               setTeams([...teams, newTeam]);
               setShowCreateModal(false);
+              // Update usage count
+              updateUsage({ teamsCreated: teams.length + 1 });
             }}
             userId={address}
           />
@@ -305,7 +372,7 @@ function CreateTeamModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+        className="bg-card text-card-foreground rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
       >
         <h2 className="text-2xl font-bold mb-4">Create New Team</h2>
         
@@ -397,6 +464,26 @@ function TeamDetailModal({
   const currentMember = team.members.find(m => m.userId === currentUserId);
   const canManageMembers = isOwner || currentMember?.role === 'admin';
 
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'owner': return Crown;
+      case 'admin': return Shield;
+      case 'member': return User;
+      case 'viewer': return Eye;
+      default: return User;
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'owner': return 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/20';
+      case 'admin': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20';
+      case 'member': return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20';
+      case 'viewer': return 'text-muted-foreground bg-muted';
+      default: return 'text-muted-foreground bg-muted';
+    }
+  };
+
   const tabs = [
     { id: 'members', label: 'Members', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -481,7 +568,7 @@ function TeamDetailModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto"
+        className="bg-card text-card-foreground rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto"
       >
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -494,7 +581,7 @@ function TeamDetailModal({
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+        <div className="flex space-x-1 mb-6 bg-muted p-1 rounded-lg">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -503,7 +590,7 @@ function TeamDetailModal({
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-white text-primary shadow-sm'
+                    ? 'bg-card text-primary shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -551,7 +638,7 @@ function TeamDetailModal({
                   return (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className="flex items-center justify-between p-3 border rounded-lg shadow-sm hover:shadow-md hover:bg-muted/30 transition-all duration-200"
                     >
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
@@ -571,8 +658,8 @@ function TeamDetailModal({
                         </span>
                         <span className={`px-2 py-1 rounded-full text-xs ${
                           member.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-400' 
+                            : 'bg-yellow-100 dark:bg-yellow-950/20 text-yellow-800 dark:text-yellow-400'
                         }`}>
                           {member.status}
                         </span>
@@ -586,9 +673,31 @@ function TeamDetailModal({
 
           {activeTab === 'settings' && (
             <div className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">White Label Settings</h3>
-                <div className="p-4 border rounded-lg">
+              <FeatureGate
+                feature="white-label"
+                fallback={
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">White Label Settings</h3>
+                    <div className="p-4 border rounded-lg bg-muted/50">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h4 className="font-medium flex items-center">
+                            <Lock className="w-4 h-4 mr-2 text-muted-foreground" />
+                            White Label Branding
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            Customize the platform with your branding (Enterprise feature)
+                          </p>
+                        </div>
+                        <div className="text-sm text-muted-foreground">Enterprise Only</div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              >
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">White Label Settings</h3>
+                  <div className="p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h4 className="font-medium">White Label Branding</h4>
@@ -622,7 +731,7 @@ function TeamDetailModal({
                         <Input
                           value={team.settings.whiteLabel.brandName}
                           readOnly
-                          className="bg-gray-50"
+                          className="bg-muted"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
@@ -636,7 +745,7 @@ function TeamDetailModal({
                             <Input
                               value={team.settings.whiteLabel.primaryColor}
                               readOnly
-                              className="bg-gray-50"
+                              className="bg-muted"
                             />
                           </div>
                         </div>
@@ -650,7 +759,7 @@ function TeamDetailModal({
                             <Input
                               value={team.settings.whiteLabel.secondaryColor}
                               readOnly
-                              className="bg-gray-50"
+                              className="bg-muted"
                             />
                           </div>
                         </div>
@@ -659,6 +768,7 @@ function TeamDetailModal({
                   )}
                 </div>
               </div>
+              </FeatureGate>
 
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">SLA Settings</h3>
@@ -691,14 +801,39 @@ function TeamDetailModal({
           )}
 
           {activeTab === 'integrations' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium">Integrations</h3>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Integration
-                </Button>
-              </div>
+            <FeatureGate
+              feature="custom-integrations"
+              fallback={
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-medium">Integrations</h3>
+                    <div className="flex items-center space-x-2 text-muted-foreground">
+                      <Lock className="w-4 h-4" />
+                      <span className="text-sm">Enterprise Only</span>
+                    </div>
+                  </div>
+                  <div className="text-center py-12">
+                    <Globe className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                    <h4 className="text-lg font-medium mb-2">Custom Integrations</h4>
+                    <p className="text-muted-foreground mb-4">
+                      Connect external services with Enterprise plan
+                    </p>
+                    <Button variant="outline" disabled>
+                      <Lock className="w-4 h-4 mr-2" />
+                      Upgrade to Enterprise
+                    </Button>
+                  </div>
+                </div>
+              }
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-medium">Integrations</h3>
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Integration
+                  </Button>
+                </div>
               
               {team.settings.integrations.length === 0 ? (
                 <div className="text-center py-12">
@@ -711,7 +846,7 @@ function TeamDetailModal({
               ) : (
                 <div className="space-y-3">
                   {team.settings.integrations.map((integration) => (
-                    <div key={integration.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div key={integration.id} className="flex items-center justify-between p-3 border rounded-lg shadow-sm hover:shadow-md hover:bg-muted/30 transition-all duration-200">
                       <div className="flex items-center space-x-3">
                         <Zap className="w-5 h-5 text-primary" />
                         <div>
@@ -722,8 +857,8 @@ function TeamDetailModal({
                       <div className="flex items-center space-x-2">
                         <span className={`px-2 py-1 rounded-full text-xs ${
                           integration.enabled 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-400' 
+                            : 'bg-muted text-muted-foreground'
                         }`}>
                           {integration.enabled ? 'Active' : 'Disabled'}
                         </span>
@@ -736,6 +871,7 @@ function TeamDetailModal({
                 </div>
               )}
             </div>
+            </FeatureGate>
           )}
 
           {activeTab === 'api' && (
@@ -759,7 +895,7 @@ function TeamDetailModal({
               ) : (
                 <div className="space-y-3">
                   {team.settings.apiKeys.map((apiKey) => (
-                    <div key={apiKey.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div key={apiKey.id} className="flex items-center justify-between p-3 border rounded-lg shadow-sm hover:shadow-md hover:bg-muted/30 transition-all duration-200">
                       <div className="flex items-center space-x-3">
                         <Key className="w-5 h-5 text-primary" />
                         <div>
@@ -772,8 +908,8 @@ function TeamDetailModal({
                       <div className="flex items-center space-x-2">
                         <span className={`px-2 py-1 rounded-full text-xs ${
                           apiKey.isActive 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-green-100 dark:bg-green-950/20 text-green-800 dark:text-green-400' 
+                            : 'bg-muted text-muted-foreground'
                         }`}>
                           {apiKey.isActive ? 'Active' : 'Disabled'}
                         </span>

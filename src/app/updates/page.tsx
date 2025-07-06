@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Calendar, Star, Zap, Shield, Users, ArrowUpRight, Plus, Fix, Trash2 } from 'lucide-react';
+import { Calendar, Star, Zap, Shield, Users, ArrowUpRight, Plus, Wrench, Trash2 } from 'lucide-react';
 
 export default function UpdatesPage() {
   const releases = [
@@ -105,7 +105,7 @@ export default function UpdatesPage() {
       case 'improved':
         return ArrowUpRight;
       case 'fixed':
-        return Fix;
+        return Wrench;
       case 'removed':
         return Trash2;
       default:
@@ -144,7 +144,7 @@ export default function UpdatesPage() {
   const stats = [
     { label: 'Total Releases', value: '45', icon: Star },
     { label: 'Features Added', value: '120+', icon: Plus },
-    { label: 'Bugs Fixed', value: '200+', icon: Fix },
+    { label: 'Bugs Fixed', value: '200+', icon: Wrench },
     { label: 'Active Users', value: '50K+', icon: Users }
   ];
 

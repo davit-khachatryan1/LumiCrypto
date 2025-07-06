@@ -1,9 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Token } from '@/lib/types';
+import { Token, SearchResult } from '@/lib/types';
 import { fetchTokens, searchTokens, generateAIAnalysis } from '@/lib/api';
 import { useStore } from '@/lib/store';
 import { TokenCard } from '@/components/TokenCard';
@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export default function ExplorePage() {
+function ExplorePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -84,7 +84,7 @@ export default function ExplorePage() {
 
     try {
       setLoading(true);
-      const results = await searchTokens(query);
+      const results: SearchResult[] = await searchTokens(query);
       
       if (results.length === 0) {
         toast.error('No tokens found for your search');
@@ -92,7 +92,7 @@ export default function ExplorePage() {
       }
 
       // Convert search results to tokens (simplified)
-      const searchTokens = results.map(result => ({
+      const foundTokens = results.map(result => ({
         id: result.id,
         symbol: result.symbol,
         name: result.name,
@@ -118,7 +118,7 @@ export default function ExplorePage() {
         last_updated: new Date().toISOString(),
       }));
 
-      setTokens(searchTokens);
+      setTokens(foundTokens);
       setHasMore(false);
     } catch (error) {
       toast.error('Search failed');
@@ -290,35 +290,49 @@ export default function ExplorePage() {
           </Card>
         </motion.div>
 
-        {/* Stats Bar */}
+        {/* Stats Cards */}
         <motion.div
-          className="mb-8"
+          className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="p-4 text-center">
-              <DollarSign className="w-6 h-6 text-green-400 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Total Market Cap</p>
-              <p className="text-lg font-bold">$2.1T</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <BarChart3 className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">24h Volume</p>
-              <p className="text-lg font-bold">$89.2B</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <TrendingUp className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Markets</p>
-              <p className="text-lg font-bold">10,248</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <Sparkles className="w-6 h-6 text-orange-400 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Active Users</p>
-              <p className="text-lg font-bold">1.2M</p>
-            </Card>
-          </div>
+          <Card className="p-4">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="w-8 h-8 text-green-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Total Tokens</p>
+                <p className="text-2xl font-bold">{tokens.length}</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4">
+            <div className="flex items-center space-x-2">
+              <DollarSign className="w-8 h-8 text-blue-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Market Cap</p>
+                <p className="text-2xl font-bold">$2.1T</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4">
+            <div className="flex items-center space-x-2">
+              <BarChart3 className="w-8 h-8 text-purple-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">24h Volume</p>
+                <p className="text-2xl font-bold">$89B</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4">
+            <div className="flex items-center space-x-2">
+              <Sparkles className="w-8 h-8 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Categories</p>
+                <p className="text-2xl font-bold">{categories.length - 1}</p>
+              </div>
+            </div>
+          </Card>
         </motion.div>
 
         {/* Token Grid */}
@@ -328,51 +342,56 @@ export default function ExplorePage() {
           transition={{ delay: 0.3 }}
         >
           {loading && tokens.length === 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
               {Array.from({ length: 12 }).map((_, i) => (
                 <TokenCardSkeleton key={i} />
               ))}
             </div>
           ) : (
-            <>
-              <div className={`grid gap-6 ${
-                viewMode === 'grid' 
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                  : 'grid-cols-1'
-              }`}>
-                {tokens.map((token, index) => (
-                  <motion.div
-                    key={token.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <TokenCard
-                      token={token}
-                      onSelect={handleTokenSelect}
-                      onAnalyze={handleTokenAnalyze}
-                    />
-                  </motion.div>
-                ))}
-              </div>
+            <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+                             {tokens.map((token) => (
+                 <TokenCard
+                   key={token.id}
+                   token={token}
+                   onSelect={handleTokenSelect}
+                   onAnalyze={handleTokenAnalyze}
+                 />
+               ))}
+            </div>
+          )}
 
-              {/* Load More Button */}
-              {hasMore && (
-                <div className="text-center mt-12">
-                  <Button
-                    onClick={loadMore}
-                    loading={loading}
-                    size="lg"
-                    className="px-8"
-                  >
-                    Load More Tokens
-                  </Button>
-                </div>
-              )}
-            </>
+          {/* Load More */}
+          {hasMore && tokens.length > 0 && (
+            <div className="text-center mt-8">
+              <Button
+                onClick={loadMore}
+                disabled={loading}
+                loading={loading}
+                size="lg"
+              >
+                {loading ? 'Loading...' : 'Load More Tokens'}
+              </Button>
+            </div>
+          )}
+
+          {/* No Results */}
+          {!loading && tokens.length === 0 && (
+            <div className="text-center py-12">
+              <Sparkles className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No tokens found</h3>
+              <p className="text-muted-foreground">Try adjusting your search or filter criteria</p>
+            </div>
           )}
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function ExplorePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+      <ExplorePageContent />
+    </Suspense>
   );
 } 

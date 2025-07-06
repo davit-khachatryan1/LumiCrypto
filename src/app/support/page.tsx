@@ -21,9 +21,12 @@ import {
   Shield,
   Crown,
   FileText,
-  Send
+  Send,
+  Lock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useBillingStore } from '@/lib/store';
+import { UpgradePrompt, FeatureGate } from '@/components/UpgradePrompt';
 
 export default function SupportPage() {
   const { address } = useAccount();
@@ -31,6 +34,10 @@ export default function SupportPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [loading, setLoading] = useState(true);
+  const { currentPlan, checkFeatureAccess } = useBillingStore();
+  
+  const prioritySupportAccess = checkFeatureAccess('priority-support');
+  const hasPrioritySupport = prioritySupportAccess.canUseFeature;
 
   useEffect(() => {
     if (address) {
@@ -54,11 +61,11 @@ export default function SupportPage() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'text-red-600 bg-red-50 border-red-200';
-      case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'low': return 'text-green-600 bg-green-50 border-green-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'urgent': return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800';
+      case 'high': return 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800';
+      case 'medium': return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800';
+      case 'low': return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800';
+      default: return 'text-muted-foreground bg-muted border-border';
     }
   };
 
@@ -74,12 +81,12 @@ export default function SupportPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'in_progress': return 'text-purple-600 bg-purple-50 border-purple-200';
-      case 'waiting': return 'text-orange-600 bg-orange-50 border-orange-200';
-      case 'resolved': return 'text-green-600 bg-green-50 border-green-200';
-      case 'closed': return 'text-gray-600 bg-gray-50 border-gray-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'open': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800';
+      case 'in_progress': return 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800';
+      case 'waiting': return 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800';
+      case 'resolved': return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800';
+      case 'closed': return 'text-muted-foreground bg-muted border-border';
+      default: return 'text-muted-foreground bg-muted border-border';
     }
   };
 
@@ -116,9 +123,13 @@ export default function SupportPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold gradient-text mb-2">Priority Support</h1>
+              <h1 className="text-4xl font-bold gradient-text mb-2">
+                {hasPrioritySupport ? 'Priority Support' : 'Support'}
+              </h1>
               <p className="text-muted-foreground">
-                Get expert help with priority response times
+                {hasPrioritySupport 
+                  ? 'Get expert help with priority response times' 
+                  : 'Get help from our community and basic support'}
               </p>
             </div>
             <Button onClick={() => setShowCreateModal(true)}>
@@ -135,31 +146,66 @@ export default function SupportPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500">
-                  <Crown className="w-6 h-6 text-white" />
+          <FeatureGate
+            feature="priority-support"
+            fallback={
+              <Card className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-gray-400 to-gray-500">
+                      <HelpCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold">Basic Support</h3>
+                      <p className="text-muted-foreground">Community support with standard response times</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center space-x-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-orange-600">24-48h</div>
+                        <div className="text-sm text-muted-foreground">Response Time</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">9-5</div>
+                        <div className="text-sm text-muted-foreground">Availability</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold">Pro Plan Support</h3>
-                  <p className="text-muted-foreground">Priority response within 2 hours</p>
-                </div>
-              </div>
-              <div className="text-right">
+              </Card>
+            }
+          >
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">< 2h</div>
-                    <div className="text-sm text-muted-foreground">Response Time</div>
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500">
+                    <Crown className="w-6 h-6 text-white" />
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">24/7</div>
-                    <div className="text-sm text-muted-foreground">Availability</div>
+                  <div>
+                    <h3 className="text-xl font-bold">{currentPlan.name} Plan Support</h3>
+                    <p className="text-muted-foreground">
+                      {currentPlan.id === 'enterprise' ? 'Dedicated support with SLA guarantee' : 'Priority response within 2 hours'}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center space-x-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">
+                        {currentPlan.id === 'enterprise' ? '< 1h' : '< 2h'}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Response Time</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">24/7</div>
+                      <div className="text-sm text-muted-foreground">Availability</div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </FeatureGate>
         </motion.div>
 
         {/* Stats */}
@@ -264,7 +310,7 @@ export default function SupportPage() {
                     return (
                       <div
                         key={ticket.id}
-                        className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                        className="p-4 border rounded-lg shadow-sm hover:shadow-md hover:bg-muted/50 dark:hover:bg-muted/20 cursor-pointer transition-all duration-200"
                         onClick={() => setSelectedTicket(ticket)}
                       >
                         <div className="flex items-center justify-between">
@@ -305,6 +351,22 @@ export default function SupportPage() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Upgrade Prompt */}
+        {!hasPrioritySupport && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8"
+          >
+            <UpgradePrompt
+              feature="priority-support"
+              title="Upgrade to Priority Support"
+              description="Get faster response times, dedicated support, and priority handling of your tickets with Pro or Enterprise plans."
+              requiredPlan="pro"
+            />
+          </motion.div>
+        )}
 
         {/* Create Ticket Modal */}
         {showCreateModal && (
@@ -386,7 +448,7 @@ function CreateTicketModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+        className="bg-card text-card-foreground rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
       >
         <h2 className="text-2xl font-bold mb-4">Create Support Ticket</h2>
         
@@ -499,7 +561,7 @@ function TicketDetailModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+        className="bg-card text-card-foreground rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">{ticket.title}</h2>
@@ -521,7 +583,7 @@ function TicketDetailModal({
             </span>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-muted p-4 rounded-lg">
             <p className="text-sm text-muted-foreground mb-2">Original Message</p>
             <p>{ticket.description}</p>
           </div>
@@ -533,8 +595,8 @@ function TicketDetailModal({
                 key={response.id}
                 className={`p-3 rounded-lg ${
                   response.isStaff 
-                    ? 'bg-blue-50 border-l-4 border-blue-500' 
-                    : 'bg-gray-50 border-l-4 border-gray-300'
+                    ? 'bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500' 
+                    : 'bg-muted border-l-4 border-border'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -575,21 +637,21 @@ function TicketDetailModal({
 
 function getPriorityColor(priority: string) {
   switch (priority) {
-    case 'urgent': return 'text-red-600 bg-red-50 border-red-200';
-    case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
-    case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    case 'low': return 'text-green-600 bg-green-50 border-green-200';
-    default: return 'text-gray-600 bg-gray-50 border-gray-200';
+    case 'urgent': return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800';
+    case 'high': return 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800';
+    case 'medium': return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800';
+    case 'low': return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800';
+    default: return 'text-muted-foreground bg-muted border-border';
   }
 }
 
 function getStatusColor(status: string) {
   switch (status) {
-    case 'open': return 'text-blue-600 bg-blue-50 border-blue-200';
-    case 'in_progress': return 'text-purple-600 bg-purple-50 border-purple-200';
-    case 'waiting': return 'text-orange-600 bg-orange-50 border-orange-200';
-    case 'resolved': return 'text-green-600 bg-green-50 border-green-200';
-    case 'closed': return 'text-gray-600 bg-gray-50 border-gray-200';
-    default: return 'text-gray-600 bg-gray-50 border-gray-200';
+    case 'open': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800';
+    case 'in_progress': return 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800';
+    case 'waiting': return 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800';
+    case 'resolved': return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800';
+    case 'closed': return 'text-muted-foreground bg-muted border-border';
+    default: return 'text-muted-foreground bg-muted border-border';
   }
 } 

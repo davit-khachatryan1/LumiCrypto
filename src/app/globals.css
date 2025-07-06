@@ -4,6 +4,34 @@
 
 @layer base {
   :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 98%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 98%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 263.4 70% 50.4%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -28,7 +56,6 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --radius: 0.5rem;
   }
 }
 
@@ -53,8 +80,61 @@
   .glow-effect {
     @apply shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] transition-all duration-300;
   }
+
+  .card-shadow {
+    @apply shadow-sm border border-border;
+  }
+
+  .dark .card-shadow {
+    @apply shadow-lg shadow-black/10 border border-border;
+  }
+
+  .elevated-card {
+    @apply bg-card border border-border shadow-md hover:shadow-lg transition-all duration-200;
+  }
+
+  .dark .elevated-card {
+    @apply bg-card border border-border shadow-xl shadow-black/20 hover:shadow-2xl hover:shadow-black/30;
+  }
+
+  .section-container {
+    @apply bg-card border border-border shadow-md rounded-xl;
+  }
+
+  .dark .section-container {
+    @apply bg-card border border-border shadow-xl shadow-black/20 rounded-xl;
+  }
+
+  .modal-container {
+    @apply bg-background border border-border shadow-2xl rounded-xl;
+  }
+
+  .dark .modal-container {
+    @apply bg-background border border-border shadow-2xl shadow-black/50 rounded-xl;
+  }
+
+  .form-input {
+    @apply bg-background border border-border shadow-sm focus:shadow-md focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200;
+  }
+
+  .dark .form-input {
+    @apply bg-background border border-border shadow-inner focus:shadow-lg focus:ring-2 focus:ring-primary/30 focus:border-primary/60;
+  }
   
   .floating-gradient {
+    background: linear-gradient(
+      45deg,
+      rgba(124, 58, 237, 0.05) 0%,
+      rgba(236, 72, 153, 0.05) 25%,
+      rgba(59, 130, 246, 0.05) 50%,
+      rgba(16, 185, 129, 0.05) 75%,
+      rgba(124, 58, 237, 0.05) 100%
+    );
+    background-size: 200% 200%;
+    animation: float-gradient 4s ease-in-out infinite;
+  }
+
+  .dark .floating-gradient {
     background: linear-gradient(
       45deg,
       rgba(124, 58, 237, 0.1) 0%,

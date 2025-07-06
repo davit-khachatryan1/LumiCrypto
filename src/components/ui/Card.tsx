@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+
 import { cn } from '@/lib/utils';
 import { forwardRef } from 'react';
 
@@ -12,20 +12,19 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, hover = false, glow = false, children, ...props }, ref) => {
     return (
-      <motion.div
+      <div
         ref={ref}
         className={cn(
-          'glass-card',
-          hover && 'cursor-pointer',
+          'bg-card text-card-foreground rounded-xl border border-border shadow-sm transition-all duration-200',
+          'dark:shadow-lg dark:shadow-black/10',
+          hover && 'cursor-pointer hover:shadow-md hover:-translate-y-0.5 hover:scale-[1.02] dark:hover:shadow-xl dark:hover:shadow-black/20',
           glow && 'glow-effect',
           className
         )}
-        whileHover={hover ? { y: -2, scale: 1.02 } : undefined}
-        transition={{ duration: 0.2 }}
         {...props}
       >
         {children}
-      </motion.div>
+      </div>
     );
   }
 );
