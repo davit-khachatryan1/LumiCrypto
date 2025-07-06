@@ -191,4 +191,161 @@ export interface SearchResult {
   symbol: string;
   thumb: string;
   market_cap_rank: number;
+}
+
+export interface CustomAlert {
+  id: string;
+  userId: string;
+  type: 'price' | 'portfolio' | 'market' | 'news';
+  name: string;
+  description?: string;
+  isActive: boolean;
+  conditions: AlertCondition[];
+  actions: AlertAction[];
+  createdAt: string;
+  updatedAt: string;
+  triggeredAt?: string;
+  triggerCount: number;
+}
+
+export interface AlertCondition {
+  id: string;
+  type: 'price_above' | 'price_below' | 'price_change' | 'volume_change' | 'market_cap_change' | 'portfolio_value';
+  token?: string;
+  value: number;
+  timeframe?: '1h' | '24h' | '7d' | '30d';
+  operator: 'greater_than' | 'less_than' | 'equals' | 'percentage_change';
+}
+
+export interface AlertAction {
+  id: string;
+  type: 'email' | 'sms' | 'push' | 'webhook';
+  enabled: boolean;
+  settings: {
+    email?: string;
+    phone?: string;
+    webhookUrl?: string;
+    message?: string;
+  };
+}
+
+export interface NotificationPreferences {
+  email: boolean;
+  sms: boolean;
+  push: boolean;
+  webhook: boolean;
+  priceAlerts: boolean;
+  portfolioUpdates: boolean;
+  marketNews: boolean;
+  systemUpdates: boolean;
+  frequency: 'instant' | 'hourly' | 'daily' | 'weekly';
+}
+
+export interface SupportTicket {
+  id: string;
+  userId: string;
+  type: 'technical' | 'billing' | 'feature' | 'bug' | 'general';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'open' | 'in_progress' | 'waiting' | 'resolved' | 'closed';
+  title: string;
+  description: string;
+  attachments?: string[];
+  createdAt: string;
+  updatedAt: string;
+  assignedTo?: string;
+  responseTime?: number;
+  resolutionTime?: number;
+  responses: SupportResponse[];
+}
+
+export interface SupportResponse {
+  id: string;
+  ticketId: string;
+  userId: string;
+  message: string;
+  isStaff: boolean;
+  createdAt: string;
+  attachments?: string[];
+}
+
+export interface UserPlan {
+  id: string;
+  userId: string;
+  planType: 'free' | 'pro' | 'enterprise';
+  features: string[];
+  limits: {
+    tokensPerDay: number;
+    alertsLimit: number;
+    apiCalls: number;
+  };
+  supportLevel: 'standard' | 'priority' | 'dedicated';
+  createdAt: string;
+  expiresAt?: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  ownerId: string;
+  members: TeamMember[];
+  settings: TeamSettings;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TeamMember {
+  id: string;
+  userId: string;
+  email: string;
+  role: 'owner' | 'admin' | 'member' | 'viewer';
+  permissions: string[];
+  joinedAt: string;
+  status: 'active' | 'invited' | 'suspended';
+}
+
+export interface TeamSettings {
+  whiteLabel: WhiteLabelSettings;
+  integrations: TeamIntegration[];
+  apiKeys: ApiKey[];
+  sla: SLASettings;
+}
+
+export interface WhiteLabelSettings {
+  enabled: boolean;
+  brandName: string;
+  logo?: string;
+  primaryColor: string;
+  secondaryColor: string;
+  customDomain?: string;
+  hideFooter: boolean;
+  customCSS?: string;
+}
+
+export interface TeamIntegration {
+  id: string;
+  type: 'webhook' | 'slack' | 'discord' | 'teams' | 'api';
+  name: string;
+  url: string;
+  enabled: boolean;
+  settings: Record<string, any>;
+  createdAt: string;
+}
+
+export interface ApiKey {
+  id: string;
+  name: string;
+  key: string;
+  permissions: string[];
+  isActive: boolean;
+  lastUsed?: string;
+  createdAt: string;
+  expiresAt?: string;
+}
+
+export interface SLASettings {
+  responseTime: number; // in minutes
+  resolutionTime: number; // in hours
+  availabilityTarget: number; // percentage
+  monitoring: boolean;
 } 

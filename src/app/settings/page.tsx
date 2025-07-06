@@ -193,7 +193,7 @@ export default function SettingsPage() {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between p-3 bg-muted/20 border border-muted rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-muted/20 border border-muted rounded-lg gap-2">
                   <span className="text-sm text-muted-foreground">No wallet connected</span>
                   <ConnectButton />
                 </div>

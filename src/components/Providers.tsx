@@ -15,7 +15,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiConfig config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider chains={chains}>
+        <RainbowKitProvider chains={chains} appInfo={{
+          appName: 'LumiCrypto',
+          appDescription: 'AI-powered crypto insights platform',
+          appUrl: 'https://lumicrypto.com',
+          appIcon: '/favicon.ico',
+        }}>
           <div className="min-h-screen bg-background text-foreground">
             <div className="floating-gradient fixed inset-0 -z-10" />
             <Navbar />
